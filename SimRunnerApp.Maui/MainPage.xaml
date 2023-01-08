@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sk="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+             x:Class="SimRunnerApp.Maui.MainPage"
+             Loaded="ContentPage_Loaded">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <HorizontalStackLayout >
+
+            <HorizontalStackLayout Margin="20">
+                <Slider x:Name="speedSlider" WidthRequest="200" Minimum="0" Maximum="15000" ValueChanged="speedSlider_ValueChanged" />
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Margin="20">
+                <CheckBox x:Name="pressureCheck" CheckedChanged="pressureCheck_CheckedChanged" />
+                <Label VerticalTextAlignment="Center" >Pressure</Label>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Margin="20">
+                <CheckBox x:Name="colorSmokeCheck" CheckedChanged="colorSmokeCheck_CheckedChanged"/>
+                <Label VerticalTextAlignment="Center">Color Smoke</Label>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Margin="20">
+                <CheckBox x:Name="showFlowLinesCheck" CheckedChanged="showFlowLinesCheck_CheckedChanged"/>
+                <Label VerticalTextAlignment="Center">Show Flow Lines</Label>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Margin="20">
+                <Label x:Name="fpsLabel" VerticalTextAlignment="Center">0fps</Label>
+            </HorizontalStackLayout>
+        </HorizontalStackLayout>
+
+        <sk:SKCanvasView Grid.Row="2"
+            x:Name="canvasView" 
+            PaintSurface="canvasView_PaintSurface" />
+
+    </Grid>
+
+</ContentPage>
