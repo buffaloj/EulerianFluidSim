@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinformsApp", "EulerianFluidSim\WinformsApp.csproj", "{D051C415-8AED-4EF1-A823-2BB4E29B1166}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinformsApp", "WinformsApp\WinformsApp.csproj", "{DFF54A17-AB34-4DB3-81F2-1B8F9CD50730}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D051C415-8AED-4EF1-A823-2BB4E29B1166}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D051C415-8AED-4EF1-A823-2BB4E29B1166}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D051C415-8AED-4EF1-A823-2BB4E29B1166}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D051C415-8AED-4EF1-A823-2BB4E29B1166}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFF54A17-AB34-4DB3-81F2-1B8F9CD50730}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFF54A17-AB34-4DB3-81F2-1B8F9CD50730}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFF54A17-AB34-4DB3-81F2-1B8F9CD50730}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFF54A17-AB34-4DB3-81F2-1B8F9CD50730}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
