@@ -7,6 +7,7 @@ namespace EulerianFluidSim
     {
         private Bitmap _bitmap;
         private Simulation _simulation;
+        private SimulationRenderer _simulationRenderer;
 
         public void StepSimulation(float elapsed)
         {
@@ -21,11 +22,12 @@ namespace EulerianFluidSim
             height /= 5;
             _bitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
             _simulation = new Simulation(width, height, 1.0f, 1.0f, 1.9f);
+            _simulationRenderer = new SimulationRenderer(_simulation);
 
             speedBar.Value = (int)_simulation.FlowRate;
-            checkPressure.Checked = _simulation.ShowPressure;
-            checkColorSmoke.Checked = _simulation.ShowColoredSmoke;
-            checkFlowLines.Checked = _simulation.ShowFlowLines;
+            checkPressure.Checked = _simulationRenderer.ShowPressure;
+            checkColorSmoke.Checked = _simulationRenderer.ShowColoredSmoke;
+            checkFlowLines.Checked = _simulationRenderer.ShowFlowLines;
         }
 
         public MainForm()
@@ -37,7 +39,7 @@ namespace EulerianFluidSim
 
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
-            _simulation.Render(_bitmap);
+            _simulationRenderer.Render(_bitmap);
             e.Graphics.DrawImage(_bitmap, ClientRectangle);
         }
 
@@ -60,17 +62,17 @@ namespace EulerianFluidSim
 
         private void checkPressure_CheckedChanged(object sender, EventArgs e)
         {
-            _simulation.ShowPressure = checkPressure.Checked;
+            _simulationRenderer.ShowPressure = checkPressure.Checked;
         }
 
         private void checkColorSmoke_CheckedChanged(object sender, EventArgs e)
         {
-            _simulation.ShowColoredSmoke = checkColorSmoke.Checked;
+            _simulationRenderer.ShowColoredSmoke = checkColorSmoke.Checked;
         }
 
         private void checkFlowLines_CheckedChanged(object sender, EventArgs e)
         {
-            _simulation.ShowFlowLines = checkFlowLines.Checked;
+            _simulationRenderer.ShowFlowLines = checkFlowLines.Checked;
         }
     }
 }

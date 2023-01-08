@@ -3,52 +3,48 @@
     public enum Fields { U_Field, V_Field, S_Field }
     public class Simulation
     {
-        private readonly int _numCellsX;
-        private readonly int _numCellsY;
+        public int NumCellsX { get; private set; }
+        public int NumCellsY { get; private set; }
+        public float GridSpacing { get; private set; }
+
+        public readonly float[,] s;
+        public readonly float[,] p;
+        public float[,] m;
+
         private float[,] u;
         private float[,] v;
+        
+        private float[,] newm;
         private float[,] newu;
         private float[,] newv;
-        private readonly float[,] p;
-        private readonly float[,] s;
-        private float[,] m;
-        private float[,] newm;
+
         private float _density;
-        private float _gridSpacing;
+        
         private float _overRelaxation;
         private int _numIterations;
         private float _gravity = -9.8f;
 
-        private float _minp = float.MaxValue;
-        private float _maxp = float.MinValue;
-
-        private float _minm = float.MaxValue;
-        private float _maxm = float.MinValue;
-
         public float FlowRate { get; set; } = 1000.0f;
-        public bool ShowPressure { get; set; } = false;
-        public bool ShowColoredSmoke { get; set; } = true;
-        public bool ShowFlowLines { get; set; } = false;
 
         public Simulation(int numCellsX, int numCellsY, float density, float gridSpacing, float overRelaxation)
         {
             _density = 1.0f;// density;
-            _gridSpacing = gridSpacing;
+            GridSpacing = gridSpacing;
             _overRelaxation = 1.9f;//overRelaxation;
             _numIterations = 10;// 000;
 
-            _numCellsX = numCellsX;
-            _numCellsY = numCellsY;
+            NumCellsX = numCellsX;
+            NumCellsY = numCellsY;
 
-            u = new float[_numCellsX, _numCellsY];
-            v = new float[_numCellsX, _numCellsY];
-            newu = new float[_numCellsX, _numCellsY];
-            newv = new float[_numCellsX, _numCellsY];
-            p = new float[_numCellsX, _numCellsY];
-            s = new float[_numCellsX, _numCellsY];
+            u = new float[NumCellsX, NumCellsY];
+            v = new float[NumCellsX, NumCellsY];
+            newu = new float[NumCellsX, NumCellsY];
+            newv = new float[NumCellsX, NumCellsY];
+            p = new float[NumCellsX, NumCellsY];
+            s = new float[NumCellsX, NumCellsY];
 
-            m = new float[_numCellsX, _numCellsY];
-            newm = new float[_numCellsX, _numCellsY];
+            m = new float[NumCellsX, NumCellsY];
+            newm = new float[NumCellsX, NumCellsY];
 
             InitAsContainedBox();
 
@@ -75,30 +71,30 @@
 
         private void InitAsContainedBox()
         {
-            for (int y = 0; y < _numCellsY; y++)
-                for (int x = 0; x < _numCellsX; x++)
+            for (int y = 0; y < NumCellsY; y++)
+                for (int x = 0; x < NumCellsX; x++)
                     s[x, y] = isEdge(x, y) ? 0.0f : 1.0f;
         }
 
         private bool isEdge(int x, int y)
         {
-            return x == 0 || x == (_numCellsX - 1) || y == 0 || y == (_numCellsY - 1);
+            return x == 0 || x == (NumCellsX - 1) || y == 0 || y == (NumCellsY - 1);
         }
 
         public void SetLeftToRightFlow(float flowRate)
         {
-            for (int y = 1; y < _numCellsY-1; y++)
+            for (int y = 1; y < NumCellsY-1; y++)
             {
                 u[0, y] = flowRate;
                 u[1, y] = flowRate;
-                u[_numCellsX - 1, y] = flowRate;
+                u[NumCellsX - 1, y] = flowRate;
             }
         }
 
         private void SetLeftSmoke(float amount)
         {
-            var begin = (int)(_numCellsY * 0.4f);
-            var end = (int)(_numCellsY * 0.6f);
+            var begin = (int)(NumCellsY * 0.4f);
+            var end = (int)(NumCellsY * 0.6f);
 
             for (int y = begin; y < end; y++)
             {
@@ -121,9 +117,9 @@
 
         private void UpdateVelocities(float timeStep)
         {
-            for (int j = 1; j < _numCellsY; j++)
+            for (int j = 1; j < NumCellsY; j++)
             {
-                for (int i = 1; i < _numCellsX; i++)
+                for (int i = 1; i < NumCellsX; i++)
                 {
                     if (s[i, j] != 0.0f && s[i, j - 1] != 0.0f)
                         v[i, j] += _gravity * timeStep;
@@ -135,8 +131,8 @@
 
         public void IterativelySolveCompressibility(float timeStep)
         {
-            for (int j = 0; j < _numCellsY; j++)
-                for (int i = 0; i < _numCellsX; i++)
+            for (int j = 0; j < NumCellsY; j++)
+                for (int i = 0; i < NumCellsX; i++)
                     p[i, j] = 0.0f;
 
             for (int i = 0; i < _numIterations; i++)
@@ -145,9 +141,9 @@
 
         private void SolveCompressibility(float timeStep)
         {
-            for (int j = 1; j < _numCellsY - 1; j++)
+            for (int j = 1; j < NumCellsY - 1; j++)
             {
-                for (int i = 1; i < _numCellsX - 1; i++)
+                for (int i = 1; i < NumCellsX - 1; i++)
                 {
                     var d = u[i + 1, j] - u[i, j] + v[i, j + 1] - v[i, j];
                     var st = s[i + 1, j] + s[i - 1, j] + s[i, j + 1] + s[i, j - 1];
@@ -161,156 +157,7 @@
                     v[i, j] += d * s[i, j - 1] / st;
                     v[i, j + 1] -= d * s[i, j + 1] / st;
 
-                    p[i, j] -= (d / st) * (_density * _gridSpacing / timeStep);
-                }
-            }
-        }
-
-        public void Render(Bitmap bitmap)
-        {
-            if (ShowPressure)
-                RenderPressure(bitmap);
-            else if (ShowColoredSmoke)
-                RenderColoredSmoke(bitmap);
-            else
-                RenderSmoke(bitmap);
-
-            if (ShowFlowLines) 
-                RenderFlowLines(bitmap);
-        }
-
-        public void RenderExamplePixels(Bitmap bitmap)
-        {
-            for (int x = 0; x < 100; x++)
-                bitmap.SetPixel(10 + x, 10, Color.Red);
-        }
-
-        private void GetMinMaxSpread(float[,] f, ref float min, ref float max, out float spread)
-        {
-            min = float.MaxValue;
-            max = float.MinValue;
-
-            for (int j = 0; j < _numCellsY; j++)
-                for (int i = 0; i < _numCellsX; i++)
-                {
-                    var val = f[i, j];
-                    if (min > val)
-                        min = val;
-                    if (max < val)
-                        max = val;
-                }
-
-            spread = max - min;
-            if (spread < 0.1f)
-                spread = 0.1f;
-        }
-
-        public void RenderSmoke(Bitmap bitmap)
-        {
-            GetMinMaxSpread(m, ref _minm, ref _maxm, out float spread);
-            for (int j = 0; j < _numCellsY; j++)
-                for (int i = 0; i < _numCellsX; i++)
-                {
-                    var percent = (m[i, j] - _minm) / spread;
-                    var gray = Math.Max(Math.Min((int)(percent * 255.0f), 255), 0);
-
-                    bitmap.SetPixel(i, _numCellsY - 1 - j, Color.FromArgb(gray, gray, gray));
-                }
-        }
-
-        public void RenderColoredSmoke(Bitmap bitmap)
-        {
-            GetMinMaxSpread(p, ref _minp, ref _maxp, out float spread);
-            GetMinMaxSpread(m, ref _minm, ref _maxm, out float smokespread);
-
-            for (int j = 0; j < _numCellsY; j++)
-                for (int i = 0; i < _numCellsX; i++)
-                {
-                    var percent = (p[i, j] - _minp) / spread;
-                    var color = LerpColor(1.0f - percent);
-
-                    percent = (m[i, j] - _minm) / smokespread;
-
-                    bitmap.SetPixel(i, _numCellsY - 1 - j, InterpolateColor(Color.Black, color, 1.0f - ((1.0f-percent)* (1.0f - percent))));
-                }
-        }
-
-        public void RenderPressure(Bitmap bitmap)
-        {
-            GetMinMaxSpread(p, ref _minp, ref _maxp, out float spread);
-
-            for (int j = 0; j < _numCellsY; j++)
-                for (int i = 0; i < _numCellsX; i++)
-                {
-                    var percent = (p[i, j] - _minp) / spread;
-
-                    var color = LerpColor(1.0f - percent);
-
-                    bitmap.SetPixel(i, _numCellsY - 1 - j, color);
-                }
-        }
-
-        private Color LerpColor(float percent)
-        {
-            var h = percent * 260.0f;
-            var s = 1.0f;
-            var l = 0.5f;
-
-            var d = s * (1 - Math.Abs(2 * l - 1));
-            var x = d * (1 - Math.Abs(h / 60 % 2 - 1));
-            var m = l - (d / 2.0f);
-
-            if (h < 60.0f)
-                return Color.FromArgb(255, (int)(255.0f * (d + m)), (int)(255.0f * (x + m)), (int)(m * 255.0f));
-            else if (h < 120.0f)
-                return Color.FromArgb(255, (int)(255.0f * (x + m)), (int)(255.0f * (d + m)), (int)(m * 255.0f));
-            else if (h < 180.0f)
-                return Color.FromArgb(255, (int)(m * 255.0f), (int)(255.0f * (d + m)), (int)(255.0f * (x + m)));
-            else if (h < 240.0f)
-                return Color.FromArgb(255, (int)(m * 255.0f), (int)(255.0f * (x + m)), (int)(255.0f * (d + m)));
-            else if (h < 300.0f)
-                return Color.FromArgb(255, (int)(255.0f * (x + m)), (int)(m * 255.0f), (int)(255.0f * (d + m)));
-            else// if (h < 360.0f)
-                return Color.FromArgb(255, (int)(255.0f * (d + m)), (int)(m * 255.0f), (int)(255.0f * (x + m)));
-                
-        }
-
-        private Color InterpolateColor(Color from, Color to, float percent)
-        {
-            var r = from.R + ((to.R - from.R) * percent);
-            var g = from.G + ((to.G - from.G) * percent);
-            var b = from.B + ((to.B - from.B) * percent);
-
-            return Color.FromArgb(255, (int)r, (int)g, (int)b);
-        }
-
-        public void RenderFlowLines(Bitmap bitmap)
-        {
-            Pen blackPen = new Pen(Color.Red, 1);
-            using (var graphics = Graphics.FromImage(bitmap))
-            {
-                for (int i = 0; i <= 8; i++)
-                {
-                    //if (i == 5 || i == 6 || i == 7)
-                      //  continue;
-
-                    for (int j = 0; j < 5; j++)
-                    {
-                        var x = _numCellsX * (0.1f * i);
-                        var y = _numCellsY * (0.2f * j);
-
-                        if (x < 1)
-                            x = 1;
-
-                        if (s[(int)x, (int)y] == 0)
-                            continue;
-                        var diru = sampleField(x * _gridSpacing, y * _gridSpacing, Fields.U_Field);
-                        var dirv = sampleField(x * _gridSpacing, y * _gridSpacing, Fields.V_Field);
-                        var len = Math.Sqrt(diru * diru + dirv * dirv);
-                        var x2 = x + (int)(((double)diru / len) * 10.0);
-                        var y2 = y + (int)(((double)dirv / len) * 10.0);
-                        graphics.DrawLine(blackPen, x, y, x2, y2);
-                    }
+                    p[i, j] -= (d / st) * (_density * GridSpacing / timeStep);
                 }
             }
         }
@@ -320,27 +167,27 @@
             CopyArrays(u, newu);
             CopyArrays(v, newv);
 
-           var h2 = _gridSpacing / 2.0f;
-           for (int j = 1; j < _numCellsY; j++)
+           var h2 = GridSpacing / 2.0f;
+           for (int j = 1; j < NumCellsY; j++)
            {
-                for (int i = 1; i < _numCellsX; i++)
+                for (int i = 1; i < NumCellsX; i++)
                 {
                     if (s[i, j] == 0)
                         continue;
 
-                    if (s[i-1, j] != 0 && j < _numCellsY-1)
+                    if (s[i-1, j] != 0 && j < NumCellsY-1)
                     {
                         var vprime = (v[i, j] + v[i, j + 1] + v[i + 1, j] + v[i + 1, j + 1]) / 4.0f;
-                        var xpos = (i * _gridSpacing) - (timeStep * u[i, j]);
-                        var ypos = (j * _gridSpacing) + h2 - (timeStep * vprime);
+                        var xpos = (i * GridSpacing) - (timeStep * u[i, j]);
+                        var ypos = (j * GridSpacing) + h2 - (timeStep * vprime);
                         newu[i, j] = sampleField(xpos, ypos, Fields.U_Field);//InterpolateU(xpos, ypos);
                     }
 
-                    if (s[i, j-1] != 0 && i < _numCellsX-1)
+                    if (s[i, j-1] != 0 && i < NumCellsX-1)
                     {
                         var uprime = (u[i, j] + u[i, j + 1] + u[i + 1, j] + u[i + 1, j + 1]) / 4.0f;
-                        var xpos = (i * _gridSpacing) + h2 - (timeStep * uprime);
-                        var ypos = (j * _gridSpacing) - (timeStep * v[i, j]);
+                        var xpos = (i * GridSpacing) + h2 - (timeStep * uprime);
+                        var ypos = (j * GridSpacing) - (timeStep * v[i, j]);
                         newv[i, j] = sampleField(xpos, ypos, Fields.V_Field);//InterpolateV(xpos, ypos);
                     }
                 }
@@ -356,19 +203,19 @@
         {
             CopyArrays(m, newm);
 
-            var h2 = _gridSpacing / 2.0f;
+            var h2 = GridSpacing / 2.0f;
 
-            for (int j = 0; j < _numCellsY-1; j++)
+            for (int j = 0; j < NumCellsY-1; j++)
             {
-                for (int i = 0; i < _numCellsX-1; i++)
+                for (int i = 0; i < NumCellsX-1; i++)
                 {
                     if (s[i, j] == 0)
                         continue;
 
                     var cu = (u[i, j] + u[i + 1, j]) * 0.5f;
                     var cv = (v[i, j] + v[i, j + 1]) * 0.5f;
-                    var x = i * _gridSpacing + h2 - timeStep * cu;
-                    var y = j * _gridSpacing + h2 - timeStep * cv;
+                    var x = i * GridSpacing + h2 - timeStep * cu;
+                    var y = j * GridSpacing + h2 - timeStep * cv;
                     newm[i, j] = sampleField(x, y, Fields.S_Field);// InterpolateM(x, y);
                 }
             }
@@ -382,8 +229,8 @@
         {
             
 
-            for (int j = 0; j < _numCellsY - 1; j++)
-                for (int i = 0; i < _numCellsX - 1; i++)
+            for (int j = 0; j < NumCellsY - 1; j++)
+                for (int i = 0; i < NumCellsX - 1; i++)
                     to[i,j] = from[i, j];
         }
 
@@ -497,28 +344,28 @@
         */
         private void extrapolate()
         {
-            for (int i = 0; i < _numCellsX; i++)
+            for (int i = 0; i < NumCellsX; i++)
             {
                 u[i, 0] = u[i, 1];
-                u[i, _numCellsY - 1] = u[i, _numCellsY - 2];
+                u[i, NumCellsY - 1] = u[i, NumCellsY - 2];
             }
 
-            for (int j = 0; j < _numCellsY; j++)
+            for (int j = 0; j < NumCellsY; j++)
             {
                 v[0, j] = v[1, j];
-                v[_numCellsX-1, j] = v[_numCellsX - 2, j];
+                v[NumCellsX-1, j] = v[NumCellsX - 2, j];
             }
         }
 
-        private float sampleField(float x, float y, Fields field)
+        public float sampleField(float x, float y, Fields field)
         {
-            var n = _numCellsX;
-            var h = _gridSpacing;
+            var n = NumCellsX;
+            var h = GridSpacing;
             var h1 = 1.0f / h;
             var h2 = h / 2.0f;
 
-            x = Math.Max(Math.Min(x, _numCellsX), h);
-            y = Math.Max(Math.Min(y, _numCellsY), h);
+            x = Math.Max(Math.Min(x, NumCellsX), h);
+            y = Math.Max(Math.Min(y, NumCellsY), h);
 
             var dx = 0.0f;
             var dy = 0.0f;
@@ -534,13 +381,13 @@
                     throw new Exception($"Unknown {nameof(Fields)} value");
             }
 
-            var x0 = Math.Min(Math.Floor((x-dx)*h1), _numCellsX-1);
+            var x0 = Math.Min(Math.Floor((x-dx)*h1), NumCellsX-1);
             var tx = ((x - dx) - x0 * h) * h1;
-            var x1 = Math.Min(x0+1, _numCellsX-1);
+            var x1 = Math.Min(x0+1, NumCellsX-1);
 
-            var y0 = Math.Min(Math.Floor((y - dy) * h1), _numCellsY - 1);
+            var y0 = Math.Min(Math.Floor((y - dy) * h1), NumCellsY - 1);
             var ty = ((y - dy) - y0 * h) * h1;
-            var y1 = Math.Min(y0 + 1, _numCellsY - 1);
+            var y1 = Math.Min(y0 + 1, NumCellsY - 1);
 
             var sx = 1.0f - tx;
             var sy = 1.0f - ty;
