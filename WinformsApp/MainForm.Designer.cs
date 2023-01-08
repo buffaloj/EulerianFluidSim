@@ -32,6 +32,7 @@
             this.checkPressure = new System.Windows.Forms.CheckBox();
             this.checkColorSmoke = new System.Windows.Forms.CheckBox();
             this.checkFlowLines = new System.Windows.Forms.CheckBox();
+            this.fpsLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.speedBar)).BeginInit();
             this.SuspendLayout();
             // 
@@ -77,11 +78,21 @@
             this.checkFlowLines.UseVisualStyleBackColor = true;
             this.checkFlowLines.CheckedChanged += new System.EventHandler(this.checkFlowLines_CheckedChanged);
             // 
+            // fpsLabel
+            // 
+            this.fpsLabel.AutoSize = true;
+            this.fpsLabel.Location = new System.Drawing.Point(624, 31);
+            this.fpsLabel.Name = "fpsLabel";
+            this.fpsLabel.Size = new System.Drawing.Size(29, 15);
+            this.fpsLabel.TabIndex = 4;
+            this.fpsLabel.Text = "0fps";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.fpsLabel);
             this.Controls.Add(this.checkFlowLines);
             this.Controls.Add(this.checkColorSmoke);
             this.Controls.Add(this.checkPressure);
@@ -102,5 +113,6 @@
         private CheckBox checkPressure;
         private CheckBox checkColorSmoke;
         private CheckBox checkFlowLines;
+        private Label fpsLabel;
     }
 }

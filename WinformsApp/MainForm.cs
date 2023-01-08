@@ -11,6 +11,9 @@ namespace EulerianFluidSim
 
         public void StepSimulation(float elapsed)
         {
+            var fps = 1.0f / elapsed;
+            fpsLabel.Text = $"{fps}fps";
+
             _simulation?.StepSimulation(elapsed);
         }
 
