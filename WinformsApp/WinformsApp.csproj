@@ -12,4 +12,8 @@
     <PackageReference Include="SharpDX.Desktop" Version="4.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EulerianFluidSim\EulerianFluidSim.csproj" />
+  </ItemGroup>
+
 </Project>
