@@ -7,17 +7,17 @@
         public int NumCellsY { get; private set; }
         public float GridSpacing { get; private set; }
 
-        public readonly float[,] s;
-        public readonly float[,] p;
-        public float[,] m;
+        public readonly float[] s;
+        public readonly float[] p;
+        public float[] m;
 
-        private float[,] u;
-        private float[,] v;
+        private float[] u;
+        private float[] v;
         
-        private float[,] newu;
-        private float[,] newv;
+        private float[] newu;
+        private float[] newv;
 
-        private float[,] newm;
+        private float[] newm;
 
         private float _density;
         
@@ -37,15 +37,15 @@
             NumCellsX = numCellsX;
             NumCellsY = numCellsY;
 
-            u = new float[NumCellsX, NumCellsY];
-            v = new float[NumCellsX, NumCellsY];
-            newu = new float[NumCellsX, NumCellsY];
-            newv = new float[NumCellsX, NumCellsY];
-            p = new float[NumCellsX, NumCellsY];
-            s = new float[NumCellsX, NumCellsY];
+            u = new float[NumCellsX*NumCellsY];
+            v = new float[NumCellsX*NumCellsY];
+            newu = new float[NumCellsX*NumCellsY];
+            newv = new float[NumCellsX*NumCellsY];
+            p = new float[NumCellsX*NumCellsY];
+            s = new float[NumCellsX*NumCellsY];
 
-            m = new float[NumCellsX, NumCellsY];
-            newm = new float[NumCellsX, NumCellsY];
+            m = new float[NumCellsX*NumCellsY];
+            newm = new float[NumCellsX*NumCellsY];
 
             InitAsContainedBox();
 
@@ -65,7 +65,7 @@
                 {
                     var dst = Math.Sqrt((i-x)*(i-x) + (j-y)*(j-y));
                     if (dst < radius)
-                        s[i,j] = 0;
+                        s[i + (j*NumCellsX)] = 0;
                 }
             }
         }
@@ -74,7 +74,7 @@
         {
             for (int y = 0; y < NumCellsY; y++)
                 for (int x = 0; x < NumCellsX; x++)
-                    s[x, y] = isEdge(x, y) ? 0.0f : 1.0f;
+                    s[x + (y * NumCellsX)] = isEdge(x, y) ? 0.0f : 1.0f;
         }
 
         private bool isEdge(int x, int y)
@@ -86,9 +86,9 @@
         {
             for (int y = 1; y < NumCellsY-1; y++)
             {
-                u[0, y] = flowRate;
-                u[1, y] = flowRate;
-                u[NumCellsX - 1, y] = flowRate;
+                u[y * NumCellsX] = flowRate;
+                u[1+ (y * NumCellsX)] = flowRate;
+                u[NumCellsX - 1+ (y * NumCellsX)] = flowRate;
             }
         }
 
@@ -99,8 +99,8 @@
 
             for (int y = begin; y < end; y++)
             {
-                m[0, y] = amount;
-                newm[0, y] = amount;
+                m[y * NumCellsX] = amount;
+                newm[y * NumCellsX] = amount;
             }
         }
 
@@ -118,12 +118,14 @@
 
         private void UpdateVelocities(float timeStep)
         {
+            int index = 0;
             for (int j = 1; j < NumCellsY; j++)
             {
                 for (int i = 1; i < NumCellsX; i++)
                 {
-                    if (s[i, j] != 0.0f && s[i, j - 1] != 0.0f)
-                        v[i, j] += _gravity * timeStep;
+                    index = i + (j * NumCellsX);
+                    if (s[index] != 0.0f && s[i + ((j-1) * NumCellsX)] != 0.0f)
+                        v[index] += _gravity * timeStep;
                 }
             }
 
@@ -132,9 +134,10 @@
 
         public void IterativelySolveCompressibility(float timeStep)
         {
+            int index = 0;
             for (int j = 0; j < NumCellsY; j++)
                 for (int i = 0; i < NumCellsX; i++)
-                    p[i, j] = 0.0f;
+                    p[index++] = 0.0f;
 
             for (int i = 0; i < _numIterations; i++)
                 SolveCompressibility(timeStep);
@@ -142,83 +145,101 @@
 
         private void SolveCompressibility(float timeStep)
         {
+            int j0 = 0, jp1 = 0, jm1 = 0;
             var some = _density * GridSpacing / timeStep;
             for (int j = 1; j < NumCellsY - 1; j++)
             {
                 for (int i = 1; i < NumCellsX - 1; i++)
                 {
-                    var d = u[i + 1, j] - u[i, j] + v[i, j + 1] - v[i, j];
-                    var st = s[i + 1, j] + s[i - 1, j] + s[i, j + 1] + s[i, j - 1];
+                    j0 = j * NumCellsX;
+                    jp1 = j0 + NumCellsX;
+                    jm1 = j0 - NumCellsX;
+
+                    var d = u[i + 1+ j0] - u[i+ j0] + v[i+ jp1] - v[i+ j0];
+                    var st = s[i + 1+ j0] + s[i - 1+ j0] + s[i+ jp1] + s[i+ jm1];
                     if (st == 0.0f)
                         continue;
 
                     d *= _overRelaxation;
+                    var invst = 1.0f / st;
 
-                    u[i, j] += d * s[i - 1, j] / st;
-                    u[i+1, j] -= d * s[i + 1, j] / st;
-                    v[i, j] += d * s[i, j - 1] / st;
-                    v[i, j + 1] -= d * s[i, j + 1] / st;
+                    u[i+ j0] += d * s[i - 1+ j0] * invst;
+                    u[i+1+ j0] -= d * s[i + 1+ j0] * invst;
+                    v[i+ j0] += d * s[i+ jm1] * invst;
+                    v[i+ jp1] -= d * s[i+ jp1] * invst;
 
-                    p[i, j] -= (d / st) * some;
+                    p[i+j0] -= (d / st) * some;
                 }
             }
         }
 
         private void AdvectVelocities(float timeStep)
         {
-           // CopyArrays(u, newu);
-           // CopyArrays(v, newv);
+             CopyArrays(u, newu);
+             CopyArrays(v, newv);
 
-           var h2 = GridSpacing / 2.0f;
+            int j0 = 0, jp1 = 0, jm1 = 0;
+            var h2 = GridSpacing / 2.0f;
            for (int j = 1; j < NumCellsY; j++)
            {
                 for (int i = 1; i < NumCellsX; i++)
                 {
-                    if (s[i, j] == 0)
+                    j0 = j * NumCellsX;
+
+                    if (s[i+ j0] == 0)
                         continue;
 
-                    if (s[i-1, j] != 0 && j < NumCellsY-1)
+                    jp1 = j0 + NumCellsX;
+                    jm1 = j0 - NumCellsX;
+
+                    if (s[i-1+ j0] != 0 && j < NumCellsY-1)
                     {
-                        var vprime = (v[i, j] + v[i, j + 1] + v[i + 1, j] + v[i + 1, j + 1]) * 0.25f;
-                        var xpos = (i * GridSpacing) - (timeStep * u[i, j]);
+                        var vprime = (v[i+ j0] + v[i+ jp1] + v[i + 1+ j0] + v[i + 1+ jp1]) * 0.25f;
+                        var xpos = (i * GridSpacing) - (timeStep * u[i+j0]);
                         var ypos = (j * GridSpacing) + h2 - (timeStep * vprime);
-                        newu[i, j] = sampleField(xpos, ypos, Fields.U_Field);//InterpolateU(xpos, ypos);
+                        newu[i+ j0] = sampleField(xpos, ypos, Fields.U_Field);//InterpolateU(xpos, ypos);
                     }
 
-                    if (s[i, j-1] != 0 && i < NumCellsX-1)
+                    if (s[i+ jm1] != 0 && i < NumCellsX-1)
                     {
-                        var uprime = (u[i, j] + u[i, j + 1] + u[i + 1, j] + u[i + 1, j + 1]) * 0.25f;
+                        var uprime = (u[i+ j0] + u[i+ jp1] + u[i + 1+ j0] + u[i + 1+ jp1]) * 0.25f;
                         var xpos = (i * GridSpacing) + h2 - (timeStep * uprime);
-                        var ypos = (j * GridSpacing) - (timeStep * v[i, j]);
-                        newv[i, j] = sampleField(xpos, ypos, Fields.V_Field);//InterpolateV(xpos, ypos);
+                        var ypos = (j * GridSpacing) - (timeStep * v[i+ j0]);
+                        newv[i+ j0] = sampleField(xpos, ypos, Fields.V_Field);//InterpolateV(xpos, ypos);
                     }
                 }
             }
 
-           // CopyArrays(newu, u);
-           // CopyArrays(newv, v);
-            SwapArrays(ref u, ref newu);
-            SwapArrays(ref v, ref newv);
+            CopyArrays(newu, u);
+            CopyArrays(newv, v);
+            //SwapArrays(ref u, ref newu);
+            //SwapArrays(ref v, ref newv);
         }
 
         private void AdvectSmoke(float timeStep)
         {
             CopyArrays(m, newm);
 
+            int j0 = 0, jp1 = 0, jm1 = 0;
             var h2 = GridSpacing / 2.0f;
 
             for (int j = 0; j < NumCellsY-1; j++)
             {
                 for (int i = 0; i < NumCellsX-1; i++)
                 {
-                    if (s[i, j] == 0)
+                    j0 = j * NumCellsX;
+
+                    if (s[i+ j0] == 0)
                         continue;
 
-                    var cu = (u[i, j] + u[i + 1, j]) * 0.5f;
-                    var cv = (v[i, j] + v[i, j + 1]) * 0.5f;
+                    jp1 = j0 + NumCellsX;
+                    jm1 = j0 - NumCellsX;
+
+                    var cu = (u[i+ j0] + u[i + 1+ j0]) * 0.5f;
+                    var cv = (v[i+ j0] + v[i+ jp1]) * 0.5f;
                     var x = i * GridSpacing + h2 - timeStep * cu;
                     var y = j * GridSpacing + h2 - timeStep * cv;
-                    newm[i, j] = sampleField(x, y, Fields.S_Field);// InterpolateM(x, y);
+                    newm[i+ j0] = sampleField(x, y, Fields.S_Field);// InterpolateM(x, y);
                 }
             }
 
@@ -227,16 +248,18 @@
             //SwapArrays(ref m, ref newm);
         }
 
-        private void CopyArrays(float[,] from, float[,] to)
+        private void CopyArrays(float[] from, float[] to)
         {
-            
-
+            var index = 0;
             for (int j = 0; j < NumCellsY - 1; j++)
                 for (int i = 0; i < NumCellsX - 1; i++)
-                    to[i,j] = from[i, j];
+                {
+                    index = i + j * NumCellsX;
+                    to[index] = from[index];
+                }
         }
 
-        private void SwapArrays(ref float[,] a, ref float[,] b)
+        private void SwapArrays(ref float[] a, ref float[] b)
         {
             var tmp = a;
             a = b;
@@ -344,20 +367,20 @@
             return w00 * w10 * m[i, j] + w01 * w10 * m[i + 1, j] + w00 * w11 * m[i, j + 1] + w01 * w11 * m[i + 1, j + 1];
         }
         */
-        private void extrapolate()
-        {
-            for (int i = 0; i < NumCellsX; i++)
-            {
-                u[i, 0] = u[i, 1];
-                u[i, NumCellsY - 1] = u[i, NumCellsY - 2];
-            }
+        //private void extrapolate()
+        //{
+        //    for (int i = 0; i < NumCellsX; i++)
+        //    {
+        //        u[i, 0] = u[i, 1];
+        //        u[i, NumCellsY - 1] = u[i, NumCellsY - 2];
+        //    }
 
-            for (int j = 0; j < NumCellsY; j++)
-            {
-                v[0, j] = v[1, j];
-                v[NumCellsX-1, j] = v[NumCellsX - 2, j];
-            }
-        }
+        //    for (int j = 0; j < NumCellsY; j++)
+        //    {
+        //        v[0, j] = v[1, j];
+        //        v[NumCellsX-1, j] = v[NumCellsX - 2, j];
+        //    }
+        //}
 
         public float sampleField(float x, float y, Fields field)
         {
@@ -372,7 +395,7 @@
             var dx = 0.0f;
             var dy = 0.0f;
 
-            float[,] f;
+            float[] f;
 
             switch (field)
             {
@@ -394,10 +417,10 @@
             var sx = 1.0f - tx;
             var sy = 1.0f - ty;
 
-            var val = sx * sy * f[(int)x0, (int)y0] +
-                      tx * sy * f[(int)x1, (int)y0] +
-                      tx * ty * f[(int)x1, (int)y1] +
-                      sx * ty * f[(int)x0, (int)y1];
+            var val = sx * sy * f[(int)x0 + ((int)y0*NumCellsX)] +
+                      tx * sy * f[(int)x1 + ((int)y0 * NumCellsX)] +
+                      tx * ty * f[(int)x1 + ((int)y1 * NumCellsX)] +
+                      sx * ty * f[(int)x0 + ((int)y1 * NumCellsX)];
 
             return (float)val;
         }

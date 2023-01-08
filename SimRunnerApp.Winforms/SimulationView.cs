@@ -1,14 +1,5 @@
 ﻿using EulerianFluidSim;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace SimRunnerApp.Winforms
 {
@@ -41,7 +32,13 @@ namespace SimRunnerApp.Winforms
             if (_simulationRenderer != null)
             {
                 _simulationRenderer.Render();
+                var oldMode = e.Graphics.CompositingMode;
+                
+                e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+
+                e.Graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
                 e.Graphics.DrawImage(_bitmap, ClientRectangle);
+                e.Graphics.CompositingMode = oldMode;
             }
         }
 

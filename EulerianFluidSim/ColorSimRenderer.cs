@@ -39,7 +39,7 @@
                 RenderFlowLines();
         }
 
-        private void GetMinMaxSpread(Simulation sim, float[,] f, ref float min, ref float max, out float spread)
+        private void GetMinMaxSpread(Simulation sim, float[] f, ref float min, ref float max, out float spread)
         {
             min = float.MaxValue;
             max = float.MinValue;
@@ -47,7 +47,7 @@
             for (int j = 0; j < sim.NumCellsY; j++)
                 for (int i = 0; i < sim.NumCellsX; i++)
                 {
-                    var val = f[i, j];
+                    var val = f[i+ (j* sim.NumCellsX)];
                     if (min > val)
                         min = val;
                     if (max < val)
@@ -65,7 +65,7 @@
             for (int j = 0; j < sim.NumCellsY; j++)
                 for (int i = 0; i < sim.NumCellsX; i++)
                 {
-                    var percent = (sim.m[i, j] - _minm) / spread;
+                    var percent = (sim.m[i+ (j*sim.NumCellsX)] - _minm) / spread;
                     setPixelColor(i, sim.NumCellsY - 1 - j, percent, percent, percent);
                 }
         }
@@ -79,10 +79,10 @@
             for (int j = 0; j < sim.NumCellsY; j++)
                 for (int i = 0; i < sim.NumCellsX; i++)
                 {
-                    var percent = (sim.p[i, j] - _minp) / spread;
+                    var percent = (sim.p[i+ (j*sim.NumCellsX)] - _minp) / spread;
                     ChoosePressureColor(percent, out red, out green, out blue);
 
-                    percent = (sim.m[i, j] - _minm) / smokespread;
+                    percent = (sim.m[i+ (j * sim.NumCellsX)] - _minm) / smokespread;
 
                     setPixelColor(i, sim.NumCellsY - 1 - j, red * percent, green * percent, blue * percent);
                 }
@@ -96,7 +96,7 @@
             for (int j = 0; j < sim.NumCellsY; j++)
                 for (int i = 0; i < sim.NumCellsX; i++)
                 {
-                    var percent = (sim.p[i, j] - _minp) / spread;
+                    var percent = (sim.p[i+ (j * sim.NumCellsX)] - _minp) / spread;
                     ChoosePressureColor(percent, out red, out green, out blue);
 
                     setPixelColor(i, sim.NumCellsY - 1 - j, red, green, blue);
@@ -163,7 +163,7 @@
                     if (x < 1)
                         x = 1;
 
-                    if (sim.s[(int)x, (int)y] == 0)
+                    if (sim.s[(int)x+ ((int)y*sim.NumCellsX)] == 0)
                         continue;
                     var diru = sim.sampleField(x * sim.GridSpacing, y * sim.GridSpacing, Fields.U_Field);
                     var dirv = sim.sampleField(x * sim.GridSpacing, y * sim.GridSpacing, Fields.V_Field);
