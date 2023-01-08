@@ -1,4 +1,4 @@
-﻿namespace EulerianFluidSim
+﻿namespace SimRunnerApp.Winforms
 {
     partial class MainForm
     {

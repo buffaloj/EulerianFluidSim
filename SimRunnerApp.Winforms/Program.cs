@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace EulerianFluidSim
+namespace SimRunnerApp.Winforms
 {
     internal static class Program
     {

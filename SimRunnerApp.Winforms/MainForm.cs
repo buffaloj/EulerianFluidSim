@@ -1,6 +1,7 @@
+using EulerianFluidSim;
 using System.Drawing.Imaging;
 
-namespace EulerianFluidSim
+namespace SimRunnerApp.Winforms
 {
     public partial class MainForm : Form
     {
@@ -68,7 +69,6 @@ namespace EulerianFluidSim
         // This is needed to avoid Windows clearing the background with causing flickering
         protected override void OnPaintBackground(PaintEventArgs e)
         {
-
         }
 
         private void speedBar_Scroll(object sender, EventArgs e)
