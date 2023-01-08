@@ -33,6 +33,8 @@
             this.checkColorSmoke = new System.Windows.Forms.CheckBox();
             this.checkFlowLines = new System.Windows.Forms.CheckBox();
             this.fpsLabel = new System.Windows.Forms.Label();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.simulationView = new SimRunnerApp.Winforms.SimulationView();
             ((System.ComponentModel.ISupportInitialize)(this.speedBar)).BeginInit();
             this.SuspendLayout();
             // 
@@ -87,11 +89,19 @@
             this.fpsLabel.TabIndex = 4;
             this.fpsLabel.Text = "0fps";
             // 
+            // simulationView
+            // 
+            this.simulationView.Location = new System.Drawing.Point(0, 55);
+            this.simulationView.Name = "simulationView";
+            this.simulationView.Size = new System.Drawing.Size(800, 394);
+            this.simulationView.TabIndex = 5;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.simulationView);
             this.Controls.Add(this.fpsLabel);
             this.Controls.Add(this.checkFlowLines);
             this.Controls.Add(this.checkColorSmoke);
@@ -114,5 +124,7 @@
         private CheckBox checkColorSmoke;
         private CheckBox checkFlowLines;
         private Label fpsLabel;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private SimulationView simulationView;
     }
 }

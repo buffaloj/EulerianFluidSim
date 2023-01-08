@@ -18,7 +18,7 @@ namespace SimRunnerApp.Winforms
                 f.FormClosing += (sender, e) => { done = true; };
 
                 Stopwatch sw = Stopwatch.StartNew();
-                long start = 0;
+                long start = sw.ElapsedMilliseconds;// 0;
                 long end = sw.ElapsedMilliseconds;
                 sw.Start();
 
@@ -34,7 +34,7 @@ namespace SimRunnerApp.Winforms
                     if (deltaTime > 0.000001f)
                     {
                         f.StepSimulation(deltaTime);
-                        f.Refresh();
+                        f.InvalidateSimView();
                     }
                     
                     Application.DoEvents(); // default message pump

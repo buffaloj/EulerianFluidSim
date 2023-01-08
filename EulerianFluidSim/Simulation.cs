@@ -14,9 +14,10 @@
         private float[,] u;
         private float[,] v;
         
-        private float[,] newm;
         private float[,] newu;
         private float[,] newv;
+
+        private float[,] newm;
 
         private float _density;
         
@@ -141,6 +142,7 @@
 
         private void SolveCompressibility(float timeStep)
         {
+            var some = _density * GridSpacing / timeStep;
             for (int j = 1; j < NumCellsY - 1; j++)
             {
                 for (int i = 1; i < NumCellsX - 1; i++)
@@ -157,15 +159,15 @@
                     v[i, j] += d * s[i, j - 1] / st;
                     v[i, j + 1] -= d * s[i, j + 1] / st;
 
-                    p[i, j] -= (d / st) * (_density * GridSpacing / timeStep);
+                    p[i, j] -= (d / st) * some;
                 }
             }
         }
 
         private void AdvectVelocities(float timeStep)
         {
-            CopyArrays(u, newu);
-            CopyArrays(v, newv);
+           // CopyArrays(u, newu);
+           // CopyArrays(v, newv);
 
            var h2 = GridSpacing / 2.0f;
            for (int j = 1; j < NumCellsY; j++)
@@ -177,7 +179,7 @@
 
                     if (s[i-1, j] != 0 && j < NumCellsY-1)
                     {
-                        var vprime = (v[i, j] + v[i, j + 1] + v[i + 1, j] + v[i + 1, j + 1]) / 4.0f;
+                        var vprime = (v[i, j] + v[i, j + 1] + v[i + 1, j] + v[i + 1, j + 1]) * 0.25f;
                         var xpos = (i * GridSpacing) - (timeStep * u[i, j]);
                         var ypos = (j * GridSpacing) + h2 - (timeStep * vprime);
                         newu[i, j] = sampleField(xpos, ypos, Fields.U_Field);//InterpolateU(xpos, ypos);
@@ -185,7 +187,7 @@
 
                     if (s[i, j-1] != 0 && i < NumCellsX-1)
                     {
-                        var uprime = (u[i, j] + u[i, j + 1] + u[i + 1, j] + u[i + 1, j + 1]) / 4.0f;
+                        var uprime = (u[i, j] + u[i, j + 1] + u[i + 1, j] + u[i + 1, j + 1]) * 0.25f;
                         var xpos = (i * GridSpacing) + h2 - (timeStep * uprime);
                         var ypos = (j * GridSpacing) - (timeStep * v[i, j]);
                         newv[i, j] = sampleField(xpos, ypos, Fields.V_Field);//InterpolateV(xpos, ypos);
@@ -193,10 +195,10 @@
                 }
             }
 
-            CopyArrays(newu, u);
-            CopyArrays(newv, v);
-            //SwapArrays(ref u, ref newu);
-            //SwapArrays(ref v, ref newv);
+           // CopyArrays(newu, u);
+           // CopyArrays(newv, v);
+            SwapArrays(ref u, ref newu);
+            SwapArrays(ref v, ref newv);
         }
 
         private void AdvectSmoke(float timeStep)
