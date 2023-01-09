@@ -6,7 +6,7 @@
     {
         public bool ShowPressure { get; set; } = false;
         public bool ShowColoredSmoke { get; set; } = true;
-        public bool ShowFlowLines { get; set; } = false;
+        //public bool ShowFlowLines { get; set; } = false;
 
         private float _minp = float.MaxValue;
         private float _maxp = float.MinValue;
@@ -15,14 +15,12 @@
         private float _maxm = float.MinValue;
 
         private readonly Simulation sim;
-        DrawLine drawLine;
 
         public byte[] bits { get; set; }
 
-        public ColorSimRenderer(Simulation simulation, DrawLine liner)
+        public ColorSimRenderer(Simulation simulation)
         {
             sim = simulation;
-            drawLine = liner;
 
             var len = sim.NumCellsX * sim.NumCellsY * 3;
             bits = new byte[len];
@@ -38,9 +36,6 @@
                 RenderColoredSmoke();
             else
                 RenderSmoke();
-
-            if (ShowFlowLines)
-                RenderFlowLines();
         }
 
         private void GetMinMaxSpread(Simulation sim, float[] f, ref float min, ref float max, out float spread)
@@ -183,7 +178,7 @@
             }
         }
 
-        private void RenderFlowLines()
+        public void RenderFlowLines(DrawLine drawLineDelegate)
         {
             for (int i = 0; i <= 8; i++)
             {
@@ -202,7 +197,7 @@
                     var len = Math.Sqrt(diru * diru + dirv * dirv);
                     var x2 = x + (int)(((double)diru / len) * 10.0);
                     var y2 = y + (int)(((double)dirv / len) * 10.0);
-                    drawLine(x, y, x2, y2);
+                    drawLineDelegate(x, y, x2, y2);
                 }
             }
         }

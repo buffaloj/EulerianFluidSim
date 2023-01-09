@@ -13,14 +13,11 @@ namespace SimRunnerApp.Maui
         private SKPaint linePen = new SKPaint { Color = new SKColor(0xffff0000) };
         private SKCanvas _canvas;
 
+        private bool _showFlowLines;
+
         public MainPage()
         {
             InitializeComponent();
-        }
-
-        private void DrawLine(float x1, float y1, float x2, float y2)
-        {
-            _canvas.DrawLine(new SKPoint(x1, y1), new SKPoint(x2, y2), linePen);
         }
 
         private void ContentPage_Loaded(object sender, EventArgs e)
@@ -33,7 +30,7 @@ namespace SimRunnerApp.Maui
             sw.Start();
 
             IDispatcherTimer timer = Dispatcher.CreateTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(100);
+            timer.Interval = TimeSpan.FromMilliseconds(10);
             timer.Tick += (sender, e) =>
             {
                 timer.Stop();
@@ -71,7 +68,7 @@ namespace SimRunnerApp.Maui
             _bitmap = new SKBitmap(width, height);
             _canvas = new SKCanvas(_bitmap);
             _simulation = new Simulation(width, height, 1.0f, 1.0f, 1.9f);
-            _renderer = new ColorSimRenderer(_simulation, DrawLine);
+            _renderer = new ColorSimRenderer(_simulation);
 
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
@@ -80,7 +77,7 @@ namespace SimRunnerApp.Maui
             speedSlider.Value = (int)_simulation.FlowRate;
             pressureCheck.IsChecked = _renderer.ShowPressure;
             colorSmokeCheck.IsChecked = _renderer.ShowColoredSmoke;
-            showFlowLinesCheck.IsChecked = _renderer.ShowFlowLines;
+            showFlowLinesCheck.IsChecked = _showFlowLines;
         }
 
         private void canvasView_PaintSurface(object sender, SKPaintSurfaceEventArgs e)
@@ -96,28 +93,27 @@ namespace SimRunnerApp.Maui
 
             _renderer.Render();
 
-            
-
-              //  _bitmap.SetPixel(x, y, new SKColor((byte)(255 * red), (byte)(255 * green), (byte)(255 * blue)));
-
-            // render the bitmap to the canvas
             var mainDisplayInfo = DeviceDisplay.MainDisplayInfo;
             var width = canvasView.Width * mainDisplayInfo.Density;
             var height = canvasView.Height * mainDisplayInfo.Density;
 
-            using SKCanvas sKCanvas = new SKCanvas(_bitmap);
+            // render the bitmap to the canvas
+            //using SKCanvas sKCanvas = new SKCanvas(_bitmap);
             byte red = 0, green = 0, blue = 0;
             int index = 0;
             for (int j = 0; j < _simulation.NumCellsY; j++) 
             { 
                 for (int i = 0; i < _simulation.NumCellsX; i++) 
                 {
-                    red = _renderer.bits[index++];
-                    green = _renderer.bits[index++];
                     blue = _renderer.bits[index++];
-                    sKCanvas.DrawPoint(i, j, new SKColor(red, green, blue));
+                    green = _renderer.bits[index++];
+                    red = _renderer.bits[index++];
+                    _canvas.DrawPoint(i, j, new SKColor(red, green, blue));
                 }
             }
+
+            if (_showFlowLines)
+                _renderer.RenderFlowLines((x1,y1,x2,y2) => _canvas.DrawLine(new SKPoint(x1, y1), new SKPoint(x2, y2), linePen));
 
             var paint2 = new SKPaint { FilterQuality = SKFilterQuality.High };
             canvas.DrawBitmap(_bitmap, new SKRect(0.0f, 0.0f, (float)width, (float)height), paint2);
@@ -137,7 +133,7 @@ namespace SimRunnerApp.Maui
 
         private void showFlowLinesCheck_CheckedChanged(object sender, CheckedChangedEventArgs e)
         {
-            _renderer.ShowFlowLines = showFlowLinesCheck.IsChecked;
+            _showFlowLines = showFlowLinesCheck.IsChecked;
             canvasView.InvalidateSurface();
         }
 
