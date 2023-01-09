@@ -1,6 +1,5 @@
 ﻿namespace EulerianFluidSim
 {
-    public delegate void SetPixelColor(int x, int y, float red, float green, float blue);
     public delegate void DrawLine(float x1, float y1, float x2, float y2);
 
     public class ColorSimRenderer
@@ -16,15 +15,13 @@
         private float _maxm = float.MinValue;
 
         private readonly Simulation sim;
-        private readonly SetPixelColor setPixelColor;
         DrawLine drawLine;
 
         public byte[] bits { get; set; }
 
-        public ColorSimRenderer(Simulation simulation, SetPixelColor setter, DrawLine liner)
+        public ColorSimRenderer(Simulation simulation, DrawLine liner)
         {
             sim = simulation;
-            setPixelColor = setter;
             drawLine = liner;
 
             var len = sim.NumCellsX * sim.NumCellsY * 3;
@@ -83,7 +80,6 @@
                     bits[index++] = (byte)(percent);
                     bits[index++] = (byte)(percent);
                     bits[index++] = (byte)(percent);
-                    //setPixelColor(i, sim.NumCellsY - 1 - j, percent, percent, percent);
                 }
         }
 
@@ -111,7 +107,6 @@
                     bits[index++] = (byte)(percent * red);
                     bits[index++] = (byte)(percent * green);
                     bits[index++] = (byte)(percent * blue);
-                    //setPixelColor(i, sim.NumCellsY - 1 - j, red * percent, green * percent, blue * percent);
                 }
         }
 
@@ -137,7 +132,6 @@
                     bits[index++] = (byte)(red*255.0f);
                     bits[index++] = (byte)(green * 255.0f);
                     bits[index++] = (byte)(blue * 255.0f);
-                    //setPixelColor(i, sim.NumCellsY - 1 - j, red, green, blue);
                 }
         }
 

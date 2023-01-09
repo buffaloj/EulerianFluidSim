@@ -19,7 +19,7 @@ namespace SimRunnerApp.Winforms
             }
 
             _bitmap = new Bitmap(sim.NumCellsX, sim.NumCellsY, PixelFormat.Format24bppRgb);
-            _simulationRenderer = new ColorSimRenderer(sim, SetPixelColor, DrawLine);
+            _simulationRenderer = new ColorSimRenderer(sim, DrawLine);
 
             return _simulationRenderer;
         }
@@ -64,11 +64,6 @@ namespace SimRunnerApp.Winforms
         }
 
         protected override void OnPaintBackground(PaintEventArgs e){ /* Leave this empty to avoid clearing the background since the bitmap will do this anyway */}
-
-        private void SetPixelColor(int x, int y, float red, float green, float blue)
-        {
-            _bitmap.SetPixel(x, y, Color.FromArgb(255, (byte)(255 * red), (byte)(255 * green), (byte)(255 * blue)));
-        }
 
         private void DrawLine(float x1, float y1, float x2, float y2)
         {
