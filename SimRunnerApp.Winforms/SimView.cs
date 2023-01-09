@@ -24,6 +24,15 @@ namespace SimRunnerApp.Winforms
             return _simulationRenderer;
         }
 
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            _graphicsBuffer?.Dispose();
+            using (Graphics graphics = CreateGraphics())
+            {
+                _graphicsBuffer = BufferedGraphicsManager.Current.Allocate(graphics, ClientRectangle);// new Rectangle(0, 0, sim.NumCellsX, sim.NumCellsY));
+            }
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             if (_simulationRenderer != null)

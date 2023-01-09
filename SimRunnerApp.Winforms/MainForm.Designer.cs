@@ -91,6 +91,9 @@
             // 
             // simView
             // 
+            this.simView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.simView.Location = new System.Drawing.Point(0, 71);
             this.simView.Name = "simView";
             this.simView.Size = new System.Drawing.Size(800, 379);
