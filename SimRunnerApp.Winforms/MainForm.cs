@@ -19,7 +19,8 @@ namespace SimRunnerApp.Winforms
 
         public void InvalidateSimView()
         {
-            simulationView.Invalidate();  
+            //simulationView.Invalidate();
+            simView.Invalidate();
         }
 
         private void CreateSim()
@@ -31,7 +32,9 @@ namespace SimRunnerApp.Winforms
             //_bitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
             _simulation = new Simulation(width, height, 1.0f, 1.0f, 1.9f);
             //_simulationRenderer = new ColorSimRenderer(_simulation, SetPixelColor, DrawLine);
-            _simulationRenderer = simulationView.SetSimulation(_simulation);
+            //_simulationRenderer = simulationView.SetSimulation(_simulation);
+            _simulationRenderer = simView.SetSimulation(_simulation);
+            
 
             speedBar.Value = (int)_simulation.FlowRate;
             checkPressure.Checked = _simulationRenderer.ShowPressure;
@@ -57,12 +60,6 @@ namespace SimRunnerApp.Winforms
             InitializeComponent();
 
             CreateSim();
-        }
-
-        private void MainForm_Paint(object sender, PaintEventArgs e)
-        {
-            //_simulationRenderer.Render();
-            //e.Graphics.DrawImage(_bitmap, ClientRectangle);
         }
 
         private void MainForm_Resize(object sender, EventArgs e)

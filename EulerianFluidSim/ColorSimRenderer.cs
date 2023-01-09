@@ -19,11 +19,18 @@
         private readonly SetPixelColor setPixelColor;
         DrawLine drawLine;
 
+        public byte[] bits { get; set; }
+
         public ColorSimRenderer(Simulation simulation, SetPixelColor setter, DrawLine liner)
         {
             sim = simulation;
             setPixelColor = setter;
             drawLine = liner;
+
+            var len = sim.NumCellsX * sim.NumCellsY * 3;
+            bits = new byte[len];
+            for (int i = 0; i < len; i++)
+                bits[i] = 255;
         }
 
         public void Render()
@@ -61,12 +68,22 @@
 
         private void RenderSmoke()
         {
+            int index = 0;
+            int j0 = 0;
+            int jmax = (sim.NumCellsY- 1)*sim.NumCellsX;
             GetMinMaxSpread(sim, sim.m, ref _minm, ref _maxm, out float spread);
+            var invspread = (1.0f / spread)*255.0f;
             for (int j = 0; j < sim.NumCellsY; j++)
                 for (int i = 0; i < sim.NumCellsX; i++)
                 {
-                    var percent = (sim.m[i+ (j*sim.NumCellsX)] - _minm) / spread;
-                    setPixelColor(i, sim.NumCellsY - 1 - j, percent, percent, percent);
+                    j0 = j * sim.NumCellsX;
+                    var percent = (sim.m[i+j0] - _minm) * invspread;
+
+                    index = (i + jmax - j0) * 3;
+                    bits[index++] = (byte)(percent);
+                    bits[index++] = (byte)(percent);
+                    bits[index++] = (byte)(percent);
+                    //setPixelColor(i, sim.NumCellsY - 1 - j, percent, percent, percent);
                 }
         }
 
@@ -75,16 +92,26 @@
             GetMinMaxSpread(sim, sim.p, ref _minp, ref _maxp, out float spread);
             GetMinMaxSpread(sim, sim.m, ref _minm, ref _maxm, out float smokespread);
 
+            int index = 0;
+            int j0 = 0;
+            int jmax = (sim.NumCellsY - 1) * sim.NumCellsX;
+            var invspread = 1.0f / spread;
+            var invsmokespread = (1.0f / smokespread) * 255.0f;
             float red; float green; float blue;
             for (int j = 0; j < sim.NumCellsY; j++)
                 for (int i = 0; i < sim.NumCellsX; i++)
                 {
-                    var percent = (sim.p[i+ (j*sim.NumCellsX)] - _minp) / spread;
+                    j0 = j * sim.NumCellsX;
+
+                    var percent = (sim.p[i+ j0] - _minp) * invspread;
                     ChoosePressureColor(percent, out red, out green, out blue);
+                    percent = (sim.m[i+ j0] - _minm) * invsmokespread;
 
-                    percent = (sim.m[i+ (j * sim.NumCellsX)] - _minm) / smokespread;
-
-                    setPixelColor(i, sim.NumCellsY - 1 - j, red * percent, green * percent, blue * percent);
+                    index = (i + jmax-j0) * 3;
+                    bits[index++] = (byte)(percent * red);
+                    bits[index++] = (byte)(percent * green);
+                    bits[index++] = (byte)(percent * blue);
+                    //setPixelColor(i, sim.NumCellsY - 1 - j, red * percent, green * percent, blue * percent);
                 }
         }
 
@@ -92,20 +119,31 @@
         {
             GetMinMaxSpread(sim, sim.p, ref _minp, ref _maxp, out float spread);
 
+            int index = 0;
+            int j0 = 0;
+            int jmax = (sim.NumCellsY - 1) * sim.NumCellsX;
+            var invspread = (1.0f / spread);
+
             float red; float green; float blue;
             for (int j = 0; j < sim.NumCellsY; j++)
                 for (int i = 0; i < sim.NumCellsX; i++)
                 {
-                    var percent = (sim.p[i+ (j * sim.NumCellsX)] - _minp) / spread;
+                    j0 = j * sim.NumCellsX;
+
+                    var percent = (sim.p[i+ j0] - _minp) * invspread;
                     ChoosePressureColor(percent, out red, out green, out blue);
 
-                    setPixelColor(i, sim.NumCellsY - 1 - j, red, green, blue);
+                    index = (i + jmax-j0) * 3;
+                    bits[index++] = (byte)(red*255.0f);
+                    bits[index++] = (byte)(green * 255.0f);
+                    bits[index++] = (byte)(blue * 255.0f);
+                    //setPixelColor(i, sim.NumCellsY - 1 - j, red, green, blue);
                 }
         }
 
         private void ChoosePressureColor(float percent, out float red, out float green, out float blue)
         {
-            var h = (1.0f - percent) * 260.0f;
+            var h = percent * 260.0f;
             var s = 1.0f;
             var l = 0.5f;
 

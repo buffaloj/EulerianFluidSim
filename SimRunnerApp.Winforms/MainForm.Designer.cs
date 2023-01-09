@@ -34,7 +34,7 @@
             this.checkFlowLines = new System.Windows.Forms.CheckBox();
             this.fpsLabel = new System.Windows.Forms.Label();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.simulationView = new SimRunnerApp.Winforms.SimulationView();
+            this.simView = new SimRunnerApp.Winforms.SimView();
             ((System.ComponentModel.ISupportInitialize)(this.speedBar)).BeginInit();
             this.SuspendLayout();
             // 
@@ -89,19 +89,20 @@
             this.fpsLabel.TabIndex = 4;
             this.fpsLabel.Text = "0fps";
             // 
-            // simulationView
+            // simView
             // 
-            this.simulationView.Location = new System.Drawing.Point(0, 55);
-            this.simulationView.Name = "simulationView";
-            this.simulationView.Size = new System.Drawing.Size(800, 394);
-            this.simulationView.TabIndex = 5;
+            this.simView.Location = new System.Drawing.Point(0, 71);
+            this.simView.Name = "simView";
+            this.simView.Size = new System.Drawing.Size(800, 379);
+            this.simView.TabIndex = 6;
+            this.simView.Text = "simView1";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.simulationView);
+            this.Controls.Add(this.simView);
             this.Controls.Add(this.fpsLabel);
             this.Controls.Add(this.checkFlowLines);
             this.Controls.Add(this.checkColorSmoke);
@@ -109,7 +110,6 @@
             this.Controls.Add(this.speedBar);
             this.Name = "MainForm";
             this.Text = "MainForm";
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.MainForm_Paint);
             this.Resize += new System.EventHandler(this.MainForm_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.speedBar)).EndInit();
             this.ResumeLayout(false);
@@ -125,6 +125,6 @@
         private CheckBox checkFlowLines;
         private Label fpsLabel;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private SimulationView simulationView;
+        private SimView simView;
     }
 }

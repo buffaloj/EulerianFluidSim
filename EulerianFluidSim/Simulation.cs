@@ -124,7 +124,7 @@
                 for (int i = 1; i < NumCellsX; i++)
                 {
                     index = i + (j * NumCellsX);
-                    if (s[index] != 0.0f && s[i + ((j-1) * NumCellsX)] != 0.0f)
+                    if (s[index] != 0.0f && s[index - NumCellsX] != 0.0f)
                         v[index] += _gravity * timeStep;
                 }
             }
@@ -175,8 +175,8 @@
 
         private void AdvectVelocities(float timeStep)
         {
-             CopyArrays(u, newu);
-             CopyArrays(v, newv);
+            // CopyArrays(u, newu);
+           //  CopyArrays(v, newv);
 
             int j0 = 0, jp1 = 0, jm1 = 0;
             var h2 = GridSpacing / 2.0f;
@@ -210,15 +210,15 @@
                 }
             }
 
-            CopyArrays(newu, u);
-            CopyArrays(newv, v);
-            //SwapArrays(ref u, ref newu);
-            //SwapArrays(ref v, ref newv);
+            //CopyArrays(newu, u);
+            //CopyArrays(newv, v);
+            SwapArrays(ref u, ref newu);
+            SwapArrays(ref v, ref newv);
         }
 
         private void AdvectSmoke(float timeStep)
         {
-            CopyArrays(m, newm);
+           // CopyArrays(m, newm);
 
             int j0 = 0, jp1 = 0, jm1 = 0;
             var h2 = GridSpacing / 2.0f;
@@ -243,9 +243,9 @@
                 }
             }
 
-            CopyArrays(newm, m);
+            //CopyArrays(newm, m);
 
-            //SwapArrays(ref m, ref newm);
+            SwapArrays(ref m, ref newm);
         }
 
         private void CopyArrays(float[] from, float[] to)
@@ -417,7 +417,7 @@
             var sx = 1.0f - tx;
             var sy = 1.0f - ty;
 
-            var val = sx * sy * f[(int)x0 + ((int)y0*NumCellsX)] +
+            var val = sx * sy * f[(int)x0 + ((int)y0 * NumCellsX)] +
                       tx * sy * f[(int)x1 + ((int)y0 * NumCellsX)] +
                       tx * ty * f[(int)x1 + ((int)y1 * NumCellsX)] +
                       sx * ty * f[(int)x0 + ((int)y1 * NumCellsX)];
