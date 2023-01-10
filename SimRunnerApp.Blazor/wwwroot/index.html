@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>SimRunnerApp.Blazor</title>
+    <base href="/" />
+    <link href="css/app.css" rel="stylesheet" />
+    
+    <!-- If you add any scoped CSS files, uncomment the following to load them
+    <link href="SimRunnerApp.Blazor.styles.css" rel="stylesheet" /> -->
+</head>
+
+<body>
+    <div id="app">Loading...</div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+
+    <script>
+        //var canvas = document.getElementById("myCanvas");
+        //var c = canvas.getContext("2d");	
+
+        window.setImage = async (imageElementId, imageStream) => {
+
+            var canvas = document.getElementById("myCanvas");
+            var c = canvas.getContext("2d");
+
+            const arrayBuffer = await imageStream.arrayBuffer();
+            const view = new Uint8Array(arrayBuffer);
+
+            id = c.getImageData(0, 0, canvas.width, canvas.height)
+
+            var p = 0;
+            var j = 0;
+            for (var y = 0; y < canvas.width; y++)
+                for (var x = 0; x < canvas.width; x++) {
+                    id.data[p++] = view[j++]; 
+                    id.data[p++] = view[j++]; 
+                    id.data[p++] = view[j++]; 
+                    id.data[p++] = 255; 
+                }
+
+            c.putImageData(id, 0, 0);
+
+            
+            //const blob = new Blob([arrayBuffer]);
+            //const url = URL.createObjectURL(blob);
+            //const image = document.getElementById(imageElementId);
+            //image.onload = () => {
+            //    URL.revokeObjectURL(url);
+            //}
+            //image.src = url;
+        }
+
+        function renderJS(timeStamp) {
+            theInstance.invokeMethodAsync('RenderInBlazor', timeStamp);
+            window.requestAnimationFrame(renderJS);
+        }
+
+        function resizeCanvasToFitWindow() {
+            var canvas = document.getElementById("myCanvas");
+            //var holder = document.getElementById('canvasHolder');
+            //var canvas = holder.querySelector('canvas');
+            //if (canvas) {
+            //    canvas.width = window.innerWidth;
+            //    canvas.height = window.innerHeight;
+            theInstance.invokeMethodAsync('ResizeInBlazor', canvas.width, canvas.height);
+            //}
+        }
+
+        window.initRenderJS = (instance) => {
+            window.theInstance = instance;
+            window.addEventListener("resize", resizeCanvasToFitWindow);
+            resizeCanvasToFitWindow();
+            window.requestAnimationFrame(renderJS);
+        };
+    </script>
+
+</body>
+
+</html>

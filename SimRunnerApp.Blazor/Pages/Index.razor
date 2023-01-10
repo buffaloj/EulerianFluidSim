@@ -1,0 +1,114 @@
+﻿@page "/"
+@using EulerianFluidSim;
+@using System.Diagnostics;
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<h1>Stream Image Data Example</h1>
+
+<p>
+    <img id="image" />
+</p>
+
+<p>
+<canvas id="myCanvas" style="border:2px solid"></canvas>
+</p>
+
+<button @onclick="SetImageAsync">
+    Set Image
+</button>
+
+@code {
+    private Simulation _simulation;
+    private ColorSimRenderer _renderer;
+    private float? _lastTimeStamp;
+    Stopwatch sw;
+    long start, end;
+
+    private async Task<Stream> GetImageStreamAsync()
+    {
+        return await Http.GetStreamAsync(
+            "https://avatars.githubusercontent.com/u/9141961");
+    }
+
+    private async Task SetImageAsync()
+    {
+        var imageStream = await GetImageStreamAsync();
+        var dotnetImageStream = new DotNetStreamReference(imageStream);
+        await JS.InvokeVoidAsync("setImage", "image", dotnetImageStream);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //this.ctx = await _canvasReference.CreateCanvas2DAsync();
+        await JS.InvokeAsync<object>("initRenderJS", DotNetObjectReference.Create(this));
+        await base.OnInitializedAsync();
+    }
+
+    [JSInvokable]
+    public void ResizeInBlazor(double width, double height)     
+    {
+        if (_simulation == null)
+        {
+            _simulation = new Simulation((int)width, (int)height, 1.0f, 1.0f, 1.9f);
+            _renderer = new ColorSimRenderer(_simulation);
+
+            sw = Stopwatch.StartNew();
+            start = 0;
+            end = sw.ElapsedMilliseconds;
+            sw.Start();
+        }
+    }
+
+    [JSInvokable]
+    public async ValueTask RenderInBlazor(float timeStamp)//double timeStamp)
+    {
+        var elapsed = sw.ElapsedMilliseconds - start;
+        float deltaTime = (float)elapsed / 1000.0f;
+
+        start = end;
+        end = sw.ElapsedMilliseconds;
+
+        if (deltaTime > 0.00001f)
+            _simulation.StepSimulation(deltaTime);
+        _renderer.Render();
+
+        var stream = new MemoryStream(_renderer.bits);
+        var dotnetImageStream = new DotNetStreamReference(stream);
+        await JS.InvokeVoidAsync("setImage", "image", dotnetImageStream);
+
+        //SetImageAsync();
+    }
+}
+
+
+
+
+
+@*@page "/"
+
+<h1>Dynamic Image Source Example</h1>
+
+@if (imageSource is not null)
+{
+    <p>
+        <img src="@imageSource" />
+    </p>
+}
+
+@for (var i = 1; i <= 3; i++)
+{
+    var imageId = i;
+    <button @onclick="() => ShowImage(imageId)">
+        Image @imageId
+    </button>
+}
+
+@code {
+    private string? imageSource;
+
+    private void ShowImage(int id)
+    {
+        imageSource = $"images/image{id}.png";
+    }
+}*@

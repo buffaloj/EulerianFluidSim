@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EulerianFluidSim", "EulerianFluidSim\EulerianFluidSim.csproj", "{FDB9706E-5AA2-4AD8-99FF-A3DB7E94EAD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EulerianFluidSim", "EulerianFluidSim\EulerianFluidSim.csproj", "{FDB9706E-5AA2-4AD8-99FF-A3DB7E94EAD2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimRunnerApp.Winforms", "SimRunnerApp.Winforms\SimRunnerApp.Winforms.csproj", "{3BAEDBFD-C639-44AE-8B51-DC79A0CB18F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimRunnerApp.Maui", "SimRunnerApp.Maui\SimRunnerApp.Maui.csproj", "{173B07D9-D12D-4A05-9E43-648382AC542D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimRunnerApp.Maui", "SimRunnerApp.Maui\SimRunnerApp.Maui.csproj", "{173B07D9-D12D-4A05-9E43-648382AC542D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimRunnerApp.Blazor", "SimRunnerApp.Blazor\SimRunnerApp.Blazor.csproj", "{ABC6A455-5723-4519-AFD5-BC76E68EF9C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +31,10 @@ Global
 		{173B07D9-D12D-4A05-9E43-648382AC542D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{173B07D9-D12D-4A05-9E43-648382AC542D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{173B07D9-D12D-4A05-9E43-648382AC542D}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{ABC6A455-5723-4519-AFD5-BC76E68EF9C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABC6A455-5723-4519-AFD5-BC76E68EF9C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABC6A455-5723-4519-AFD5-BC76E68EF9C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABC6A455-5723-4519-AFD5-BC76E68EF9C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
