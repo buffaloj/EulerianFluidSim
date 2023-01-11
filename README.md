@@ -1,17 +1,28 @@
 # EulerianFluidSim
-A visual 2d fluid simulation with smoke/dye flowing thru a pipe with an obstacle to add cool turbulence patterns.
+A visual 2d fluid simulation with smoke/dye flowing thru a pipe with an obstacle in the middle to add cool turbulence patterns.
+
+![](fluidsim.gif)
+
+# How to Run on Windows
+1. Pull down the code
+2. Open EulerianFluidSim.sln in Visual Studio
+3. Set the Startup Project of choice:
+  1) SimRunnerApp.Winforms (best performance)
+  2) SimRunnerApp.Maui
+  3) SimRunnerApp.Blazor
+3. Run
 
 # Available Platforms
 The sim runs on windows with Winforms, crossplatform with .NetMaui, and in a browser with Blazor.
 
 # Performance
-The sim runs on all platforms purely on the CPU so the simulations and is intensive.  The output is an array of color bit which need to be dislayed.
+The sim runs on all platforms purely on the CPU and the simulations is fairly intensive. The resulting per-platform framerate mainly depends on how long it takes to flip snapshots to the screen.
 
 Winforms offers the best framerate overall. 
 
-The Maui version is slower, but still useable on Windows.  Very slow on Android.  The slower Windows performance is from how the image bits to delivered to the screen.
+The Maui version is slower, but still useable on Windows.  Very slow on Android.
 
-The web version is very very slow.  The simulation running in WebAssembly might be a slow point, but this hos not been tested.  Delivering the image bits to Lavascript seems to be the limiting factor.
+The web version is very very slow.  The simulation might run slower in WebAssembly than native .Net would, but haven't tested either way.  Delivering the image bits to Javascript seems to be the limiting factor.
 
 
 
