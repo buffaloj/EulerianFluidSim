@@ -7,9 +7,9 @@ A visual 2d fluid simulation with smoke/dye flowing thru a pipe with an obstacle
 1. Pull down the code
 2. Open EulerianFluidSim.sln in Visual Studio
 3. Set the Startup Project of choice:
-  1) SimRunnerApp.Winforms (best performance)
-  2) SimRunnerApp.Maui
-  3) SimRunnerApp.Blazor
+  - SimRunnerApp.Winforms (best performance)
+  - SimRunnerApp.Maui
+  - SimRunnerApp.Blazor
 3. Run
 
 # Available Platforms
