@@ -3,6 +3,10 @@ A visual 2d fluid simulation with smoke/dye flowing thru a pipe with an obstacle
 
 ![](fluidsim.gif)
 
+# Attribution
+The simulation is a C# implementation written using the info provided by Matthias Muller here:
+https://matthias-research.github.io/pages/tenMinutePhysics/index.html
+
 # How to Run on Windows
 1. Pull down the code
 2. Open EulerianFluidSim.sln in Visual Studio
@@ -16,7 +20,7 @@ A visual 2d fluid simulation with smoke/dye flowing thru a pipe with an obstacle
 The sim runs on windows with Winforms, crossplatform with .NetMaui, and in a browser with Blazor.
 
 # Performance
-The sim runs on all platforms purely on the CPU and the simulations is fairly intensive. The resulting per-platform framerate mainly depends on how long it takes to flip snapshots to the screen.
+The sim runs on all platforms purely on the CPU and the simulation is fairly intensive. The resulting per-platform framerate mainly depends on how long it takes to flip snapshots to the screen.
 
 Winforms offers the best framerate overall. 
 
